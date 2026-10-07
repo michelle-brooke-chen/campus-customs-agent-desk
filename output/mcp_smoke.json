@@ -1,0 +1,146 @@
+{
+  "server": "campus-customs",
+  "config_file": ".mcp.json",
+  "transport": "stdio (server launched from the .mcp.json command)",
+  "database": "data/campus_customs_new.db (configured in .mcp.json); this run used a fresh copy of data/campus_customs.db, identical to it right after a reset",
+  "run_at": "2026-10-07T16:52:12+00:00",
+  "tools_listed": [
+    "approve_price_override",
+    "check_rent_affordability",
+    "check_stock",
+    "check_vendor_can_ship",
+    "get_cash_position",
+    "get_invoice",
+    "get_lease",
+    "get_product_details",
+    "get_ticket",
+    "list_open_tickets",
+    "list_payments",
+    "list_tickets",
+    "list_vendors",
+    "pay_invoice",
+    "pay_rent",
+    "place_vendor_order",
+    "preview_payment",
+    "quote_bulk_order",
+    "reset_database",
+    "send_customer_message",
+    "update_ticket_status"
+  ],
+  "tests": [
+    {
+      "ticket": 101,
+      "prompt": "Ticket #101: Tauhid Zaman wants 1 Classic Bulldog Tee in size S. Do we have one on the shelf?",
+      "tool_name": "check_stock",
+      "arguments": {
+        "sku": "CC-TEE-WHITE",
+        "size": "S",
+        "qty_needed": 1
+      },
+      "tool_output": {
+        "sku": "CC-TEE-WHITE",
+        "name": "Classic Bulldog Tee",
+        "size": "S",
+        "location": "Aisle B",
+        "on_hand": 0,
+        "qty_needed": 1,
+        "can_fill_now": false,
+        "shortfall": 1
+      },
+      "db_verification": {
+        "query": "SELECT qty, location FROM inventory WHERE sku='CC-TEE-WHITE' AND size='S'",
+        "result": [
+          0,
+          "Aisle B"
+        ],
+        "matches_tool_output": true
+      }
+    },
+    {
+      "ticket": 102,
+      "prompt": "Ticket #102: Elm City Properties says rent is due in 2 days. Can we afford lease #1's rent, and what's left once open vendor invoices are paid too?",
+      "tool_name": "check_rent_affordability",
+      "arguments": {
+        "lease_id": 1
+      },
+      "tool_output": {
+        "today": "2026-08-31",
+        "lease_id": 1,
+        "space_name": "Chapel Street shop",
+        "landlord": "Elm City Properties",
+        "rent_due": 2400.0,
+        "due_date": "2026-09-02",
+        "days_until_due": 2,
+        "checking_balance": 3400.0,
+        "balance_as_of": "2026-08-31",
+        "can_pay_rent": true,
+        "balance_after_rent": 1000.0,
+        "open_invoices": [
+          {
+            "id": 501,
+            "vendor_id": 1,
+            "amount": 840.0,
+            "due_date": "2026-08-28",
+            "status": "open",
+            "description": "Rush reprint CC-TEE-WHITE S",
+            "vendor_name": "Bulldog Print Co",
+            "vendor_specialty": "apparel reprint",
+            "lead_days": 5,
+            "overdue": true,
+            "days_past_due": 3
+          }
+        ],
+        "open_invoices_total": 840.0,
+        "balance_after_rent_and_open_invoices": 160.0,
+        "note": "No revenue is modeled: sales, quotes, and deposits never add cash."
+      },
+      "db_verification": {
+        "query": "SELECT l.monthly_rent, l.next_due, c.balance, (SELECT SUM(amount) FROM invoices WHERE status='open') FROM leases l, cash_accounts c WHERE l.id=1 AND c.name='checking'",
+        "result": [
+          2400.0,
+          "2026-09-02",
+          3400.0,
+          840.0
+        ],
+        "matches_tool_output": true
+      }
+    },
+    {
+      "ticket": 103,
+      "prompt": "Ticket #103: Yale AI Club wants 20 navy hoodies at a bulk discount. Quote it at 15% off and tell me the margin.",
+      "tool_name": "quote_bulk_order",
+      "arguments": {
+        "sku": "CC-HOOD-NAVY",
+        "qty": 20,
+        "discount_pct": 15
+      },
+      "tool_output": {
+        "sku": "CC-HOOD-NAVY",
+        "qty": 20,
+        "list_price": 58.0,
+        "unit_cost": 22.0,
+        "discount_pct": 15.0,
+        "unit_price_quoted": 49.3,
+        "list_total": 1160.0,
+        "quoted_total": 986.0,
+        "discount_amount": 174.0,
+        "cost_total": 440.0,
+        "gross_margin": 546.0,
+        "gross_margin_pct": 55.4,
+        "below_cost": false,
+        "max_discount_pct_at_cost": 62.1,
+        "note": "No revenue is modeled: sales, quotes, and deposits never add cash."
+      },
+      "db_verification": {
+        "query": "SELECT unit_cost, list_price FROM pricing WHERE sku='CC-HOOD-NAVY'",
+        "result": [
+          22.0,
+          58.0
+        ],
+        "matches_tool_output": true
+      }
+    }
+  ],
+  "all_passed": true,
+  "note": "Re-run on 2026-10-07 after the server grew to 21 tools. Problem 9 has since changed data/campus_customs_new.db, so this run used a fresh copy of data/campus_customs.db, which is exactly what campus_customs_new.db holds right after a reset. Tool outputs and db_verification results come from that copy."
+}

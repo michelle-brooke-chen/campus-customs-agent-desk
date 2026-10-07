@@ -1,0 +1,18 @@
+# Secrets: the Portkey API key lives here (share .env.example instead)
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node / Vite (also covered by frontend/.gitignore)
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Local tool settings
+.claude/settings.local.json
+
+# macOS
+.DS_Store

@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "timestamp": "2026-10-07T16:12:58+00:00",
+    "run_id": "1226bcddf2d3",
+    "ticket_id": null,
+    "actor": "runner",
+    "event": "database_reset",
+    "result": {
+      "ok": true,
+      "restored_from": "campus_customs.db",
+      "open_tickets": 3,
+      "checking_balance": 3400.0
+    },
+    "previous_trail": "audit_trail_20261007T161258Z.json"
+  }
+]
