@@ -125,3 +125,7 @@
 6. Yes, please write a README.md at the root. Add instructions on Mac-Windows flexibility if needed. Can you help me set up the repository? I have a connected GitHub account.
 7. One final sweep for errors and inconsistencies?
 8. Can you first confirm that the README explains how to copy the original database to the working copy when you need a clean run? It should also explain how to start an MCP server, FastAPI backend, React board, and reset the database before a full run of the three tickets.
+
+## Problem 11
+
+1. Yup, for "Problem 11: Submit to GitHub," please push and put the GitHub repository URL in output/github_url.txt. Thanks!

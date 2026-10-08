@@ -17,6 +17,7 @@ The harness around the Campus Customs agent team: the database it works on, the 
 | `output/audit_archive/` | Earlier trails, moved here by resets. |
 | `output/team_run.json` | Problem 5 command-line test run (`--approve none`). |
 | `output/mcp_smoke.json` | Problem 4 smoke test: each original tool called through `.mcp.json`, checked against the database. |
+| `output/github_url.txt` | The GitHub repository URL (Problem 11). |
 
 ## Database Schema
 
