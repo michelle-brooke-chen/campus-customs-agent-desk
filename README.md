@@ -22,7 +22,7 @@ The two HTML pages in `output/` open by double-clicking; they don't need the ser
 
 ## Setup
 
-You need **Python 3.12+** (built with 3.14), **Node.js 20+** (built with 24), and a **Portkey API key** with access to `gpt-6-luna`.
+You need **Python 3.10+** (built with 3.14), **Node.js 20.19+ or 22.12+** (what Vite 8 requires; built with 24), and a **Portkey API key** with access to `gpt-6-luna`.
 
 `.venv/` and `frontend/node_modules/` are specific to the computer they were installed on, so they aren't in the repo. Install them fresh on each machine, including when you switch between a Mac and a Windows PC.
 

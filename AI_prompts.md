@@ -123,3 +123,4 @@
 4. Can you send me the URL?
 5. Thanks! Any other fixes we need to make before we push to GitHub?
 6. Yes, please write a README.md at the root. Add instructions on Mac-Windows flexibility if needed. Can you help me set up the repository? I have a connected GitHub account.
+7. One final sweep for errors and inconsistencies?
