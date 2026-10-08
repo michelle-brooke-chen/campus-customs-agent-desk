@@ -80,23 +80,81 @@ Windows (PowerShell):
 Copy-Item .env.example .env
 ```
 
-## Run the desk board
+## Start from a clean database
 
-Start the API and the board in two terminals, both from this folder, with the virtual environment active in the first:
+The agents only ever work on `data/campus_customs_new.db`. `data/campus_customs.db` is the original and is never changed. Approvals change the working copy (payments, orders, ticket statuses, notes), so before a fresh run, copy the original over it. There are three ways, and all give the same result:
+
+1. **From the board:** click **Reset shop** and confirm. This is the usual way.
+2. **From the API** (with the backend running):
+
+   macOS / Linux:
+
+   ```bash
+   curl -X POST http://localhost:8000/reset
+   ```
+
+   Windows (PowerShell):
+
+   ```powershell
+   Invoke-RestMethod -Method Post http://localhost:8000/reset
+   ```
+
+3. **By copying the file yourself.** Stop the backend first, so nothing is using the database.
+
+   macOS / Linux:
+
+   ```bash
+   cp data/campus_customs.db data/campus_customs_new.db
+   ```
+
+   Windows (PowerShell):
+
+   ```powershell
+   Copy-Item data\campus_customs.db data\campus_customs_new.db -Force
+   ```
+
+The first two go through the MCP server's `reset_database` tool. They also clear the board's runs and approvals and start a fresh `output/audit_trail.json`, moving the old one to `output/audit_archive/`. A manual copy only replaces the database, so use the board or the API when you also want a clean audit trail. The command-line runner below resets on its own before a full run.
+
+After a reset, checking is $3,400.00 and tickets #101, #102, and #103 are open.
+
+## Start the pieces
+
+Run every command from this folder, with the virtual environment active in each Python terminal (`source .venv/bin/activate` on macOS / Linux, `.venv\Scripts\Activate.ps1` on Windows).
+
+**1. MCP server.** You don't need to start it for the board or the command-line runner: the backend launches it automatically with its own Python. To run it on its own, for example to try its tools from Claude Code (registered in `.mcp.json`) or another MCP client:
+
+```bash
+python mcp_server/server.py
+```
+
+It talks over stdio, so it waits silently for a client; stop it with Ctrl+C. It uses `data/campus_customs_new.db` unless the `CAMPUS_CUSTOMS_DB` environment variable points elsewhere. The tools are listed in [mcp_server/README.md](mcp_server/README.md).
+
+**2. FastAPI backend** (first terminal):
 
 ```bash
 uvicorn main:app --reload --port 8000
 ```
 
+It reads your key from `.env`, starts the MCP server, and rebuilds any earlier runs from the audit trail. The interactive docs are at <http://localhost:8000/docs>.
+
+**3. React board** (second terminal):
+
 ```bash
 npm run dev
 ```
 
-Then open <http://localhost:5173> (or <http://localhost:5173/?ticket=102> to open on a specific ticket). The API's interactive docs are at <http://localhost:8000/docs>. The board only talks to the API at `http://localhost:8000`, and the API only accepts the board from `http://localhost:5173`.
+Then open <http://localhost:5173>, or <http://localhost:5173/?ticket=102> to open on a specific ticket. The board only talks to the API at `http://localhost:8000`, and the API only accepts the board from `http://localhost:5173`.
 
-On the board: type your name in **Approving as**, pick a ticket, click **Start agent team**, then approve or decline the team's proposals. **Reset shop** restores the original database.
+## A full run of the three tickets
 
-## Run from the terminal instead
+1. Start the backend and the board (above).
+2. Type your name in **Approving as**. Every approval is recorded with it.
+3. Click **Reset shop** and confirm. The green banner should show checking back at $3,400.00.
+4. Select **#101**, click **Start agent team**, and watch the bulldogs work. When the plan is ready, read it and approve or decline each proposed action in the Approvals panel. Approve a vendor's unpaid invoice before any order from that vendor, or the server will refuse the order.
+5. Repeat for **#102** and **#103**. A ticket resolves once you approve all of its actions. If you decline something, click **Mark ticket resolved** when you're satisfied.
+6. Check the result in the Checking balance panel and in `output/audit_trail.json`.
+
+### Or from the terminal
 
 With the virtual environment active:
 
@@ -104,7 +162,7 @@ With the virtual environment active:
 python -m backend.main --approve none
 ```
 
-This resets the database, runs every open ticket, and approves nothing (drop `--approve none` to approve each action at a `y/N` prompt). Results go to `output/team_run.json` and `output/audit_trail.json`.
+This resets the database, runs all three open tickets, and approves nothing (drop `--approve none` to approve each action at a `y/N` prompt). Results go to `output/team_run.json` and `output/audit_trail.json`.
 
 ## Mac vs. Windows: the two config files to adjust
 
